@@ -35,14 +35,16 @@ body {
 }
 
 #answer-box {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 50%;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-bottom-left-radius: 5px;
+    
+    width: auto;
     height: 30px;
     position: relative;
     align-items: center;
     margin-bottom: 5px;
-    display: flex;
+    display: inline-flex;
     padding-left: 10px;
     padding-right: 10px;
     font-size: large;
