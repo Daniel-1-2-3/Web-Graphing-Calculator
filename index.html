@@ -9,56 +9,77 @@
 <body>
 
     <div class="calculator">
-        <input type="text" id="display" disabled>
+        <div id="display">
+            <div id="text-before-caret" class="displayText"></div>
+            <span id="caret"></span>
+            <div id="text-after-caret" class="displayText"></div>
+        </div>
         <div>
             <button onclick="clearDisplay()">C</button>
-            <button onclick="appendToDisplay('(')">(</button>
-            <button onclick="appendToDisplay(')')">)</button>
-            <button class="operation" onclick="appendToDisplay('/')">/</button>
+            <button onclick="addElement('(')">(</button>
+            <button onclick="addElement(')')">)</button>
+            <button class="operation" onclick="addElement('/')">/</button>
         </div>
         <div>
-            <button onclick="appendToDisplay('7')">7</button>
-            <button onclick="appendToDisplay('8')">8</button>
-            <button onclick="appendToDisplay('9')">9</button>
-            <button class="operation" onclick="appendToDisplay('*')">*</button>
+            <button onclick="addElement('7')">7</button>
+            <button onclick="addElement('8')">8</button>
+            <button onclick="addElement('9')">9</button>
+            <button class="operation" onclick="addElement('*')">*</button>
         </div>
         <div>
-            <button onclick="appendToDisplay('4')">4</button>
-            <button onclick="appendToDisplay('5')">5</button>
-            <button onclick="appendToDisplay('6')">6</button>
-            <button class="operation" onclick="appendToDisplay('-')">-</button>
+            <button onclick="addElement('4')">4</button>
+            <button onclick="addElement('5')">5</button>
+            <button onclick="addElement('6')">6</button>
+            <button class="operation" onclick="addElement('-')">-</button>
         </div>
         <div>
-            <button onclick="appendToDisplay('1')">1</button>
-            <button onclick="appendToDisplay('2')">2</button>
-            <button onclick="appendToDisplay('3')">3</button>
-            <button class="operation" onclick="appendToDisplay('+')">+</button>
+            <button onclick="addElement('1')">1</button>
+            <button onclick="addElement('2')">2</button>
+            <button onclick="addElement('3')">3</button>
+            <button class="operation" onclick="addElement('+')">+</button>
         </div>
         <div>
-            <button onclick="appendToDisplay('0')">0</button>
-            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="addElement('0')">0</button>
+            <button onclick="addElement('.')">.</button>
             <button class="equals" onclick="calculateResult()">=</button>
         </div>
     </div>
 
     <script>
-        function appendToDisplay(value) {
-            document.getElementById('display').value += value;
+    let caretPosition = 0
+    let displayText = ''
+        function addElement(value) {
+            displayText = displayText.slice(0, caretPosition) + value + displayText.slice(caretPosition);
+            caretPosition += value.length;
+            renderDisplay();
+            document.getElementById('display').scrollLeft += 100; 
+        }
+
+        function renderDisplay() {
+            // Update text-before and text-after caret
+            document.getElementById('text-before-caret').textContent = displayText.slice(0, caretPosition);
+            document.getElementById('text-after-caret').textContent = displayText.slice(caretPosition);
             document.activeElement.blur();
         }
 
         function clearDisplay() {
-            document.getElementById('display').value = '';
+            displayText = '';
+            caretPosition = 0;
+            renderDisplay();
             document.activeElement.blur();
         }
 
         function calculateResult() {
             try {
-                const result = eval(document.getElementById('display').value);
-                document.getElementById('display').value = result;
+                displayText = eval(displayText).toString();
+                caretPosition = displayText.length;
+                document.getElementById('display').scrollLeft = document.getElementById('display').scrollWidth;
+
             } catch (error) {
-                document.getElementById('display').value = 'Error';
-            }
+                displayText = 'Error';
+            } finally {
+                renderDisplay();
+            }   
             document.activeElement.blur();
         }
 
@@ -66,14 +87,22 @@
             const key = event.key;
 
             if (!isNaN(key) || ['+', '*', '/', '-', '(', ')', '.'].includes(key)){
-                appendToDisplay(key);
+                addElement(key);
             }
             else if (key==='Backspace'){
-                const currentVal = document.getElementById('display').value;
-                document.getElementById('display').value = currentVal.slice(0, -1);
-            }
-            else if (key==='Enter' || key==='='){
+                displayText = displayText.slice(0, caretPosition - 1) + displayText.slice(caretPosition);
+                caretPosition -= 1;
+                renderDisplay();
+            } else if (key==='Enter' || key==='='){
                 calculateResult();
+            } else if (key==='ArrowRight'){
+                caretPosition = Math.min(displayText.length, caretPosition + 1);
+                renderDisplay();
+                document.getElementById('display').scrollLeft += 13.5;
+            } else if (key==='ArrowLeft'){
+                caretPosition = Math.max(0, caretPosition - 1);
+                renderDisplay();
+                document.getElementById('display').scrollLeft -= 13.5;
             }
             document.activeElement.blur();
         });
