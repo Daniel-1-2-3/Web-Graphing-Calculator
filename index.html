@@ -72,12 +72,12 @@
         function calculateResult() {
             try {
                 displayText = eval(displayText).toString();
-                caretPosition = displayText.length;
                 document.getElementById('display').scrollLeft = document.getElementById('display').scrollWidth;
 
             } catch (error) {
                 displayText = 'Error';
             } finally {
+                caretPosition = displayText.length;
                 renderDisplay();
             }   
             document.activeElement.blur();
@@ -91,7 +91,7 @@
             }
             else if (key==='Backspace'){
                 displayText = displayText.slice(0, caretPosition - 1) + displayText.slice(caretPosition);
-                caretPosition -= 1;
+                caretPosition = Math.max(0, caretPosition - 1);
                 renderDisplay();
             } else if (key==='Enter' || key==='='){
                 calculateResult();
