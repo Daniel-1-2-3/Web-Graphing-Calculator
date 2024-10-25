@@ -48,17 +48,23 @@
     <script>
     let caretPosition = 0
     let displayText = ''
+        function getCaretPxPos() {
+            return document.getElementById('text-before-caret').offsetWidth;
+        }
+
         function addElement(value) {
+            prevCaretPos =  getCaretPxPos();
             displayText = displayText.slice(0, caretPosition) + value + displayText.slice(caretPosition);
             caretPosition += value.length;
             renderDisplay();
-            document.getElementById('display').scrollLeft += 100; 
+            currentCaretPos = getCaretPxPos()
+            document.getElementById('display').scrollLeft += currentCaretPos - prevCaretPos; 
         }
 
         function renderDisplay() {
             // Update text-before and text-after caret
-            document.getElementById('text-before-caret').textContent = displayText.slice(0, caretPosition);
-            document.getElementById('text-after-caret').textContent = displayText.slice(caretPosition);
+            document.getElementById('text-before-caret').textContent = displayText.slice(0, caretPosition).replace(/\s+/g, '');;
+            document.getElementById('text-after-caret').textContent = displayText.slice(caretPosition).replace(/\s+/g, '');;
             document.activeElement.blur();
         }
 
@@ -72,6 +78,7 @@
         function calculateResult() {
             try {
                 displayText = eval(displayText).toString();
+                displayText = (displayText === 'Infinity') ? displayText = 'Error' : displayText;
                 document.getElementById('display').scrollLeft = document.getElementById('display').scrollWidth;
 
             } catch (error) {
@@ -90,19 +97,25 @@
                 addElement(key);
             }
             else if (key==='Backspace'){
-                displayText = displayText.slice(0, caretPosition - 1) + displayText.slice(caretPosition);
+                if (caretPosition != 0){
+                    displayText = displayText.slice(0, caretPosition - 1) + displayText.slice(caretPosition);
+                };
                 caretPosition = Math.max(0, caretPosition - 1);
                 renderDisplay();
             } else if (key==='Enter' || key==='='){
                 calculateResult();
             } else if (key==='ArrowRight'){
+                prevCaretPos = getCaretPxPos();
                 caretPosition = Math.min(displayText.length, caretPosition + 1);
                 renderDisplay();
-                document.getElementById('display').scrollLeft += 13.5;
+                currentCaretPos = getCaretPxPos();
+                document.getElementById('display').scrollLeft += (currentCaretPos - prevCaretPos);
             } else if (key==='ArrowLeft'){
+                prevCaretPos = getCaretPxPos();
                 caretPosition = Math.max(0, caretPosition - 1);
                 renderDisplay();
-                document.getElementById('display').scrollLeft -= 13.5;
+                currentCaretPos = getCaretPxPos();
+                document.getElementById('display').scrollLeft += (currentCaretPos - prevCaretPos);
             }
             document.activeElement.blur();
         });

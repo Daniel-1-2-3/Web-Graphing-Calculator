@@ -29,9 +29,9 @@ body {
     font-family: monospace;
     position: relative;
     display: flex; 
-    align-items: center; 
+    align-items: right; 
     overflow-x: hidden;
-    justify-content: flex-start;
+    white-space: nowrap;
 }
 
 #text-before-caret,
@@ -41,7 +41,7 @@ body {
 
 #caret {
     position: relative;
-    width: 1px;
+    min-width: 2px;
     height: 90%;
     background-color: black;
     animation: blink 1s infinite step-start;
